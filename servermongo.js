@@ -4,15 +4,16 @@ const express = require('express');
 const app = express();
 const PORT = 5001;
 const mongoose = require('mongoose');
-const dokterroute = require('./router/dokterrouter')
-const pasienroute = require('./router/pasienrouter')
-const eventroute = require('./router/eventrouter')
-const obatroute = require('./router/obatrouter')
-const userroute = require('./router/userrouter')
 const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const isAuthenticated = require('./middleware/authmiddleware');
 
+// Import controllers
+const dokterController = require('./controllers/doktercontroller');
+const eventController = require('./controllers/eventcontroller');
+const obatController = require('./controllers/obatcontroller');
+const pasienController = require('./controllers/pasiencontroller');
 
 app.use(cors())
 app.use(express.json())
@@ -35,11 +36,34 @@ mongoose.connection.on('disconnected', ()=>{
     console.log('MongoDB disconnected!')
 });
 
-app.use('/api', dokterroute)
-app.use('/api', pasienroute);
-app.use('/ucil', eventroute)
-app.use('/api', obatroute)
-app.use('/api', userroute)
+
+
+// Dokter routes
+app.post('/dokters', isAuthenticated, dokterController.createDokter);
+app.get('/dokters/:id', isAuthenticated, dokterController.getDokterById);
+app.get('/dokters', isAuthenticated, dokterController.getAllDokters);
+app.put('/dokters/:id', isAuthenticated, dokterController.updateDokter);
+app.delete('/dokters/:id', isAuthenticated, dokterController.deleteDokter);
+
+// Event routes
+app.post('/events', eventController.createEvent);
+app.get('/events', eventController.getEvents);
+app.put('/events/:id', eventController.updateEvent);
+app.delete('/events/:id', eventController.deleteEvent);
+
+// Obat routes
+app.post('/obats', obatController.createObat);
+app.get('/obats/:id', obatController.getObatById);
+app.get('/obats', obatController.getAllObats);
+app.put('/obats/:id', obatController.updateObat);
+app.delete('/obats/:id', obatController.deleteObat);
+
+// Pasien routes
+app.post('/pasiens', isAuthenticated, pasienController.createPasien);
+app.get('/pasiens/:id', isAuthenticated, pasienController.getPasienById);
+app.get('/pasiens', isAuthenticated, pasienController.getAllPasiens);
+app.put('/pasiens/:id', isAuthenticated, pasienController.updatePasien);
+app.delete('/pasiens/:id', isAuthenticated, pasienController.deletePasien);
 app.listen(PORT, () => {
     connect()
     console.log(`Server is running on port ${PORT}`);
