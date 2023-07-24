@@ -37,7 +37,17 @@ mongoose.connection.on('disconnected', ()=>{
 });
 
 
+const userController = require('./controllers/usercontroller');
 
+// Register a new user
+app.post('/register', userController.registerUser);
+app.post('/login', userController.login);
+
+// Get all users
+app.get('/users', userController.getUsers);
+
+// Get logged in users
+app.get('/loggedinusers', userController.getLoggedInUsers);
 // Dokter routes
 app.post('/dokters', isAuthenticated, dokterController.createDokter);
 app.get('/dokters/:id', isAuthenticated, dokterController.getDokterById);
